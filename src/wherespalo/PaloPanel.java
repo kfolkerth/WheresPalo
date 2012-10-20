@@ -8,15 +8,17 @@ import javax.swing.event.*;
 
 //represents main content panel for the where's palo program
 public class PaloPanel extends JPanel {
+    
+    private CompassPanel compass;
     private Location current, palo;
     private JButton update;
     private JSlider bearingSlider;
-    private JLabel distance, bearingLabel;
+    private JLabel distance;
     private boolean imperial;
     private PaloUtilityPanelEast eastPanel;
     private NumberFormat format;
     private double currentBearing, currentDistance, displayedBearing;
-    private ImageIcon compass;
+
 
     public PaloPanel() {
         current = new Location(37.275290, -107.880079); //default location of Durango, CO
@@ -50,16 +52,15 @@ public class PaloPanel extends JPanel {
         distance.setHorizontalAlignment(JLabel.CENTER);
         
         displayedBearing = Double.parseDouble(format.format(current.calculateBearing(palo, currentBearing)));
-        bearingLabel = new JLabel("Your bearing towards the Palo is " + displayedBearing + " degrees.");
-        bearingLabel.setHorizontalAlignment(JLabel.CENTER);
+        compass = new CompassPanel(displayedBearing);
                 
         add (update, BorderLayout.SOUTH);
         add (bearingSlider, BorderLayout.WEST);
         add (distance, BorderLayout.NORTH);
         add (eastPanel, BorderLayout.EAST);
-        add (bearingLabel, BorderLayout.CENTER);
-        
+        add (compass, BorderLayout.CENTER);
     }
+    
     //represents button listener for update button
     private class ButtonListener implements ActionListener {
         
@@ -74,7 +75,7 @@ public class PaloPanel extends JPanel {
                 distance.setText("Your distance from the Palo is " + currentDistance + " kilometers");
             }
             displayedBearing = Double.parseDouble(format.format(current.calculateBearing(palo, currentBearing)));
-            bearingLabel.setText("Your bearing towards the Palo is " + displayedBearing + " degrees.");
+            compass.setDisplayedBearing(displayedBearing);
         }
     }
     
@@ -83,14 +84,13 @@ public class PaloPanel extends JPanel {
         
         @Override
         public void stateChanged(ChangeEvent event) {
-            
+
             currentBearing = bearingSlider.getValue();
         }
-    }
-    
+    }    
     //panel consisting of a combo box and two text fields that represent user's choice of units along with
     //current latitude and longitude
-    public class PaloUtilityPanelEast extends JPanel {
+    private class PaloUtilityPanelEast extends JPanel {
         private String[] unitOptions = new String[2];
         private JTextField latField, longField;
         private JComboBox units;
